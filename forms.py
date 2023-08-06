@@ -26,13 +26,14 @@ async def start(message: types.Message, session_maker, state: FSMContext = None)
 
         await state.set_state(Form.first_name)
         await message.answer('Введи своё имя')
+    await message.delete()
 
 
 @form_router.message(Form.first_name)
 async def process_name(message: types.Message, state: FSMContext):
     await state.update_data(first_name=message.text.capitalize())
     await message.answer(f'Твое имя {message.text.capitalize()}.\nТеперь введи свою фамилия')
-    await state.set_state(Form.last_name)   #?
+    await state.set_state(Form.last_name)
 
 
 @form_router.message(Form.last_name)

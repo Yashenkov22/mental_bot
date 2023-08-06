@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+from aiogram.fsm.storage.memory import MemoryStorage
 
 from db.models import Base
 from middlewares import DbSessionMiddleware
@@ -12,7 +13,6 @@ from config import db_url, TOKEN
 from forms import form_router
 from qiuz import quiz_router
 from handlers.handler_app import any_router
-from aiogram.fsm.storage.memory import MemoryStorage
 
 load_dotenv()
 

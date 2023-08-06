@@ -28,12 +28,12 @@ async def register_user(session: AsyncSession, data: dict, message: types.Messag
     return success
 
 
-async def add_quiz_answer(session: AsyncSession, data: dict, message: types.Message):
+async def add_quiz_answer(session: AsyncSession, data: dict, user_id: int):
     success = False
     async with session() as session:
         async with session.begin():
             session: AsyncSession
-            session.add(MentalState(user_id=message.from_user.id,
+            session.add(MentalState(user_id=user_id,
                                     state=data['answer']))
         success = True
     return success
