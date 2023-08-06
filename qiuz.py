@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram.fsm.state import StatesGroup, State
 from aiogram import types
 from aiogram.fsm.context import FSMContext
@@ -5,9 +7,10 @@ from aiogram import Router
 from aiogram.filters import Command
 from sqlalchemy.ext.asyncio import AsyncSession
 from aiogram import Bot
-from db.queries import add_quiz_answer
+from db.queries import add_quiz_answer, get_all_user_ids
 from qiuz_keyboard import quiz_kb
 from aiogram import F
+from aiogram.fsm.storage.base import StorageKey
 
 quiz_router = Router()
 
@@ -15,9 +18,24 @@ class Quiz(StatesGroup):
     answer = State()
 
 
-@quiz_router.message(Command('quiz'))
-async def qwe(message: types.Message, bot: Bot, state: FSMContext):
-    await start_quiz(bot=bot, user_id=message.from_user.id, state=state)
+
+async def qwe(bot: Bot, storage, session_maker):
+    user_ids = await get_all_user_ids(session_maker)
+    print(user_ids)
+    tasks = []
+    for user_id in user_ids:
+        user_id = user_id[0]
+        state: FSMContext = FSMContext(
+            storage=storage,
+            key=StorageKey(bot_id=bot.id,
+                           chat_id=user_id,
+                           user_id=user_id)
+        )
+        tasks.append(asyncio.create_task(start_quiz(bot=bot, user_id=user_id, state=state)))
+    # tasks = [asyncio.create_task(start_quiz(bot=bot, user_id=user_id, state=state)) for user_id in user_ids]
+    # for task in tasks:
+    #     await task
+    await asyncio.gather(*tasks)
 
 
 async def start_quiz(bot: Bot,user_id: int, state: FSMContext):

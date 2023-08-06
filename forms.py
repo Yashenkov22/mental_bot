@@ -21,6 +21,7 @@ async def start(message: types.Message, session_maker, state: FSMContext = None)
     check = await check_user(session=session_maker, user_id=message.from_user.id)
     if check:
         await message.answer(f'Привет {message.from_user.full_name}, это Полиция Выгорания, руки на копот😁\nТы уже все знаешь.')
+        await message.answer(str(message.chat.id))
     else:
         await message.answer(f'Привет {message.from_user.full_name}, это Полиция Выгорания, руки на копот😁\nЕсли серьезно, я буду следить за Вашим ментальным состоянием\nДля начала давай познакомимся.')
 

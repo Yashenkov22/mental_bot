@@ -37,3 +37,12 @@ async def add_quiz_answer(session: AsyncSession, data: dict, user_id: int):
                                     state=data['answer']))
         success = True
     return success
+
+
+async def get_all_user_ids(session: AsyncSession):
+    async with session() as session:
+        async with session.begin():
+            session: AsyncSession
+            user_ids = await session.execute(select(User.user_id))
+            user_ids: ScalarResult
+            return user_ids.all()
