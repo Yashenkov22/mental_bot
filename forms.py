@@ -1,12 +1,13 @@
+from aiogram import types, Router, Bot
 from aiogram.fsm.state import StatesGroup, State
-from aiogram import types
 from aiogram.fsm.context import FSMContext
-from aiogram import Router, F
 from aiogram.filters import Command
-from db.queries import register_user
-from sqlalchemy.ext.asyncio import AsyncSession
-from db.queries import check_user
 
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from db.queries import register_user, check_user
+from qiuz import start_quiz
 
 form_router = Router()
 
@@ -17,11 +18,10 @@ class Form(StatesGroup):
 
 
 @form_router.message(Command('start'))
-async def start(message: types.Message, session_maker, state: FSMContext = None):
-    check = await check_user(session=session_maker, user_id=message.from_user.id)
+async def start(message: types.Message, session, state: FSMContext):
+    check = await check_user(session=session, user_id=message.from_user.id)
     if check:
         await message.answer(f'Привет {message.from_user.full_name}, это Полиция Выгорания, руки на копот😁\nТы уже все знаешь.')
-        await message.answer(str(message.chat.id))
     else:
         await message.answer(f'Привет {message.from_user.full_name}, это Полиция Выгорания, руки на копот😁\nЕсли серьезно, я буду следить за Вашим ментальным состоянием\nДля начала давай познакомимся.')
 
@@ -38,15 +38,18 @@ async def process_name(message: types.Message, state: FSMContext):
 
 
 @form_router.message(Form.last_name)
-async def process_last_name(message: types.Message, state: FSMContext, session: AsyncSession):
+async def process_last_name(message: types.Message, state: FSMContext, session: AsyncSession, bot: Bot):
     await state.update_data(last_name=message.text.capitalize())
     data = await state.get_data()
-    await message.answer(f'Ваше имя: {data["first_name"]} {data["last_name"]}')
+    await message.answer(f'Приятно познакомиться, {data["first_name"]} {data["last_name"]}')
     await state.clear()
-    success = await register_user(session=session, data=data, message=message)
-    if success:
-        await message.answer('Вы зарегистрировались')
+    try:
+        await register_user(session=session, data=data, message=message)
+    except Exception:
+        await message.answer('Ошибка регистрации')
     else:
-        await message.answer('Не получилось')
-        
+        await message.answer('Вы зарегистрировались')
+        await message.answer('Периодически я буду узнавать у Вас об уровне Вашего выгорания, чтобы понять, когда Вас тушить🧯')
+        await message.answer('Давай сразу и попробуем')
+        await start_quiz(bot, message.from_user.id, state=state)
 

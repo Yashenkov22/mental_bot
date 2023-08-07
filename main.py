@@ -4,10 +4,9 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.context import FSMContext
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from db.models import Base
 from middlewares import DbSessionMiddleware
@@ -21,22 +20,26 @@ load_dotenv()
 
 async def main():
     engine = create_async_engine(db_url, echo=True)
-    session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    async_session = async_sessionmaker(engine, expire_on_commit=False)
      
     bot = Bot(TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
+
     dp.include_router(form_router)
     dp.include_router(quiz_router)
     dp.include_router(any_router)
-    dp.update.middleware(DbSessionMiddleware(session_pool=session_maker))
+    dp.update.middleware(DbSessionMiddleware(session_pool=async_session))
+
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(qwe, 'cron', second=30, args=(bot, dp.storage, session_maker))
-    # async with engine.begin() as conn:
-    #     await conn.run_sync(Base.metadata.drop_all)
-    #     await conn.run_sync(Base.metadata.create_all)
+    scheduler.add_job(qwe, 'cron', second=30, args=(bot, dp.storage, async_session))
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
         
     scheduler.start()
-    await dp.start_polling(bot, session_maker=session_maker, engine=engine)
+
+    await dp.start_polling(bot, engine=engine)
 
 
 if __name__ == '__main__':
