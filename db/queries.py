@@ -22,8 +22,7 @@ async def register_user(session: AsyncSession, data: dict, message: types.Messag
     async with session.begin():
         session: AsyncSession
         session.add(User(user_id=message.from_user.id,
-                                username=message.from_user.username,
-                                fullname=data['first_name'] + ' ' + data['last_name']))
+                         fullname=data['first_name'] + ' ' + data['last_name']))
         success = True
     return success
 
@@ -46,3 +45,10 @@ async def get_all_user_ids(session: AsyncSession):
             user_ids = await session.execute(select(User.user_id))
             user_ids: ScalarResult
             return user_ids.all()
+
+
+all_result_query = '''
+    SELECT u.fullname, date, state
+    FROM users u
+    JOIN states s on u.user_id = s.user_id
+'''

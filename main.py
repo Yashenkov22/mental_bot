@@ -36,7 +36,7 @@ async def main():
     #     await conn.run_sync(Base.metadata.create_all)
         
     scheduler.start()
-    await dp.start_polling(bot, session_maker=session_maker)
+    await dp.start_polling(bot, session_maker=session_maker, engine=engine)
 
 
 if __name__ == '__main__':
