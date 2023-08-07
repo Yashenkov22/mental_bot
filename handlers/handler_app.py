@@ -1,13 +1,14 @@
-from aiogram import types
+import os
+import pandas as pd
+from time import sleep
+from aiogram import types, Bot
 from aiogram import Router
 from aiogram.filters import Command
-import pandas as pd
 from db.queries import all_result_query
 from sqlalchemy.ext.asyncio import AsyncEngine
-from sqlalchemy.engine import create_engine
-from config import db_url
+from datetime import date
+from aiogram.types import FSInputFile
 
-# engine = create_engine(db_url)
 
 pattern = '''
 Полиция выгорания с вами на связи
@@ -23,10 +24,16 @@ def read_sql_query(con, stmt):
     return pd.read_sql_query(stmt, con)
 
 @any_router.message(Command('pand'))
-async def get_excel(message: types.Message, engine: AsyncEngine):
+async def get_excel(message: types.Message, engine: AsyncEngine, bot: Bot):
     async with engine.begin() as conn:
         data = await conn.run_sync(read_sql_query, all_result_query)
-    print(data)
+        data = data.astype({'date': str})
+    filename = str(date.today()) + '.xlsx'
+    data.to_excel(filename)
+    await message.reply_document(FSInputFile(filename))
+    if os.path.isfile(filename):
+        os.remove(filename)
+    print(data['date'])
 
 
 @any_router.message()
