@@ -1,13 +1,14 @@
 import os
+from datetime import datetime
+
 import pandas as pd
-from time import sleep
 from aiogram import types
 from aiogram import Router
-from aiogram.filters import Command
-from db.queries import all_result_query
-from sqlalchemy.ext.asyncio import AsyncEngine
-from datetime import datetime
 from aiogram.types import FSInputFile
+from aiogram.filters import Command
+from sqlalchemy.ext.asyncio import AsyncEngine
+
+from db.queries import all_result_query
 
 
 any_router = Router()
@@ -31,7 +32,7 @@ async def get_excel(message: types.Message, engine: AsyncEngine):
     if os.path.isfile(filename):
         os.remove(filename)
 
-    print(df_sql['date'])
+    # print(df_sql['date'])
 
 
 @any_router.message()

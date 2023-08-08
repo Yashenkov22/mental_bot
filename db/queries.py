@@ -28,7 +28,7 @@ async def register_user(session: AsyncSession, data: dict, message: types.Messag
                         fullname=data['first_name'] + ' ' + data['last_name']))
 
 
-async def add_quiz_answer(session: AsyncSession, data: dict, user_id: int):
+async def add_answer_to_db(session: AsyncSession, data: dict, user_id: int):
         async with session.begin():
             session: AsyncSession
             session.add(MentalState(user_id=user_id,
