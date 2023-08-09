@@ -27,11 +27,12 @@ async def get_excel(message: types.Message, engine: AsyncEngine):
     filename = str(datetime.now()) + '.xlsx'
     df_sql.to_excel(filename)
 
-    await message.reply_document(FSInputFile(filename))
+    await message.answer_document(FSInputFile(filename))
 
     if os.path.isfile(filename):
         os.remove(filename)
 
+    await message.delete()
     # print(df_sql['date'])
 
 

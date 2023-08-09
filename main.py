@@ -1,5 +1,5 @@
 import asyncio
-from dotenv import load_dotenv
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from aiogram import Bot, Dispatcher
@@ -11,11 +11,10 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from db.models import Base
 from middlewares import DbSessionMiddleware
 from config import db_url, TOKEN
-from forms import form_router
-from qiuz import quiz_router, qwe
+from handlers.register import form_router
+from handlers.qiuz import quiz_router
 from handlers.handler_app import any_router
-
-load_dotenv()
+from utils.scheduler import quiz_scheduler
 
 
 async def main():
@@ -31,7 +30,7 @@ async def main():
     dp.update.middleware(DbSessionMiddleware(session_pool=async_session))
 
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(qwe, 'cron', second=30, args=(bot, dp.storage, async_session))
+    scheduler.add_job(quiz_scheduler, 'cron', second=30, args=(bot, dp.storage, async_session))
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
