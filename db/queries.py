@@ -11,7 +11,21 @@ all_result_query = '''
     SELECT u.fullname, date, state
     FROM users u
     JOIN states s on u.user_id = s.user_id
+    ORDER BY u.fullname, date DESC
 '''
+
+
+async def current_employee_query(name, limit):
+    query = f'''
+    SELECT u.fullname, date, state
+    FROM users u
+    JOIN states s on u.user_id = s.user_id
+    WHERE u.fullname = '{name}'
+    ORDER BY date DESC
+    LIMIT {limit}
+    '''
+    return query
+      
 
 
 async def check_user(session: AsyncSession, user_id: int):
@@ -41,3 +55,10 @@ async def get_all_user_ids(session: async_sessionmaker):
             user_ids = await session.execute(select(User.user_id))
             user_ids: ScalarResult
             return user_ids.all()
+    
+
+async def get_all_usernames(session: AsyncSession):
+    result = await session.execute(select(User.fullname))
+    result: ScalarResult
+    users = result.all()
+    return users

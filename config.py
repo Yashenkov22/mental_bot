@@ -7,7 +7,7 @@ load_dotenv()
 
 
 ADMIN_ID = os.environ.get('ADMIN_ID')
-TOKEN = os.environ.get('API_TOKEN')
+TOKEN = os.environ.get('BOT_TOKEN')
 
 DB_USER = os.environ.get('DB_USER')
 DB_PASS = os.environ.get('DB_PASS')

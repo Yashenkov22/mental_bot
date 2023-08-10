@@ -24,7 +24,6 @@ class Form(StatesGroup):
 async def start_register(message: types.Message, session: AsyncSession, state: FSMContext):
     if message.from_user.id == int(ADMIN_ID):
         await message.answer('Вы админ этого бота', reply_markup=admin_kb.as_markup(resize_keyboard=True))
-    # await message.answer(str(message.from_user.id))
     else:
         check = await check_user(session=session, user_id=message.from_user.id)
         if check:
