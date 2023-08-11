@@ -25,10 +25,10 @@ excel_kb.row(types.KeyboardButton(text='Получить отчет по опр�
 excel_kb.row(types.KeyboardButton(text='В главное меню'))
 
 #Keyboard for current employee
-current_employee_kb = ReplyKeyboardBuilder()
-current_employee_kb.row(types.KeyboardButton(text='Последние 5 записей'))
-current_employee_kb.row(types.KeyboardButton(text='Последние 10 записей'))
-current_employee_kb.row(types.KeyboardButton(text='Назад'))
+limit_reconds_kb = ReplyKeyboardBuilder()
+limit_reconds_kb.row(types.KeyboardButton(text='Последние 5 записей'))
+limit_reconds_kb.row(types.KeyboardButton(text='Последние 10 записей'))
+limit_reconds_kb.row(types.KeyboardButton(text='Назад'))
 
 
 #Inline keyboard employees
@@ -38,4 +38,6 @@ async def create_employee_kb(session: AsyncSession):
     for name in emloyee_names:
         employees_kb.row(types.InlineKeyboardButton(text=name[0],
                                                     callback_data=name[0]))
+    employees_kb.row(types.InlineKeyboardButton(text='Назад',
+                                                callback_data='back'))
     return employees_kb
