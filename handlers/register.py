@@ -8,15 +8,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db.queries import register_user, check_user
 from handlers.qiuz import start_quiz
 from utils.keyboards import admin_kb
+from utils.states import RegisterUser
 from utils.register_valudate import valid_fullname
 from config import ADMIN_ID
 
 
 register_router = Router()
 
-
-class Form(StatesGroup):
-    fullname: str = State()
 
 
 @register_router.message(Command('start'))
@@ -34,11 +32,11 @@ async def start(message: types.Message, session: AsyncSession, state: FSMContext
 
 
 async def start_register(message: types.Message, state: FSMContext):
-            await state.set_state(Form.fullname)
+            await state.set_state(RegisterUser.fullname)
             await message.answer('Введи своё имя и фамилию\nПример: Авраам Руссо')
 
 
-@register_router.message(Form.fullname)
+@register_router.message(RegisterUser.fullname)
 async def end_register(message: types.Message, state: FSMContext, session: AsyncSession, bot: Bot):
     await state.update_data(fullname=message.text.title())
     data = await state.get_data()

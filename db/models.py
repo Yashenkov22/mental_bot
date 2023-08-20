@@ -17,7 +17,7 @@ class User(Base):
 class MentalState(Base):
     __tablename__ = 'states'
     
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id = mapped_column(ForeignKey('users.user_id'))
     date: Mapped[date] = mapped_column(DATE, default=date.today())
     state: Mapped[int] = mapped_column(INTEGER)

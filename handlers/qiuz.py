@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.queries import add_answer_to_db
 from utils.keyboards import quiz_kb
+from utils.states import Quiz
 from utils.name_states import response_for_state
 from utils.cat_api import get_cat
 
@@ -21,9 +22,6 @@ pattern = '''
 Где 10 - откываю фигму с формой и глаза на мокром месте, чувствую отвращение
 '''
 
-
-class Quiz(StatesGroup):
-    answer = State()
 
 
 async def start_quiz(bot: Bot, user_id: int, state: FSMContext):
@@ -44,7 +42,8 @@ async def end_quiz(callback: types.CallbackQuery, state: FSMContext, session: As
     
     try:
         await add_answer_to_db(session=session, data=data, user_id=callback.from_user.id)
-    except Exception:
+    except Exception as ex:
+        print(ex)
         await callback.message.answer('Не получилось')
     else:
         await callback.message.answer('Данные отправлены')

@@ -38,20 +38,15 @@ async def get_excel(message: Union[types.Message, types.CallbackQuery],
     else:
         filename = str(datetime.now()) + '.xlsx'
         df_sql.to_excel(filename)
-        try:
-            message: types.Message
-            await message.answer_document(FSInputFile(filename))
-            await message.delete()
         
-        except AttributeError:
-            message: types.CallbackQuery
-            await message.message.answer_document(FSInputFile(filename))
-            await message.message.delete()
+        if isinstance(message, types.CallbackQuery):
+            message = message.message
+ 
+        await message.answer_document(FSInputFile(filename))
+        await message.delete()
 
         if os.path.isfile(filename):
             os.remove(filename)
-
-        # print(df_sql['date'])
 
 
 @excel_router.message()

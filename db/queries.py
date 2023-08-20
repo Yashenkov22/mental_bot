@@ -28,10 +28,10 @@ def current_employee_query(name, limit):
 
 
 async def check_user(session: AsyncSession, user_id: int):
-            result = await session.execute(select(User).where(User.user_id == user_id))
-            result: ScalarResult
-            user = result.one_or_none()
-            return user
+    result = await session.execute(select(User).where(User.user_id == user_id))
+    result: ScalarResult
+    user = result.one_or_none()
+    return user
 
 
 async def register_user(session: AsyncSession, data: dict[str,str], message: types.Message):
@@ -43,18 +43,18 @@ async def register_user(session: AsyncSession, data: dict[str,str], message: typ
 
 
 async def add_answer_to_db(session: AsyncSession, data: dict, user_id: int):
-        async with session.begin():
-            session: AsyncSession
-            session.add(MentalState(user_id=user_id,
-                                    state=data['answer']))
+    async with session.begin():
+        session: AsyncSession
+        session.add(MentalState(user_id=user_id,
+                                state=data['answer']))
 
 
 async def get_all_user_ids(session: async_sessionmaker):
     async with session() as session:
-            session: AsyncSession
-            user_ids = await session.execute(select(User.user_id))
-            user_ids: ScalarResult
-            return user_ids.all()
+        session: AsyncSession
+        user_ids = await session.execute(select(User.user_id))
+        user_ids: ScalarResult
+        return user_ids.all()
     
 
 async def get_all_usernames(session: AsyncSession):

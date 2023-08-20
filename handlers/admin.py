@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 
 from utils.keyboards import excel_kb, admin_kb, limit_reconds_kb, create_employee_kb
 from utils.admin_decorator import admin_only
-from handlers.current_employee import CurrentEmpoyee
+from utils.states import CurrentEmpoyee
 from handlers.excel import get_excel
 from db.queries import current_employee_query
 
