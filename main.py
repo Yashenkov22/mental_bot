@@ -34,9 +34,9 @@ async def main():
     scheduler = AsyncIOScheduler()
     scheduler.add_job(quiz_scheduler, 'cron', second=30, args=(bot, dp.storage, async_session))
 
-    # async with engine.begin() as conn:
+    async with engine.begin() as conn:
     #     await conn.run_sync(Base.metadata.drop_all)
-    #     await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(Base.metadata.create_all)
         
     scheduler.start()
 
