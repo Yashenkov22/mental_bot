@@ -4,9 +4,18 @@ services:
     
     environment:
       - POSTGRES_HOST=psql_db
-    
+
     env_file:
       - ./.env
+
+    container_name: bot
+    
+    networks:
+      - custom
+
+    ports:
+      - '8000:8000'
+
 
     depends_on:
       - psql_db
@@ -18,9 +27,17 @@ services:
     
     env_file:
       - ./.env
-    
+
+    networks:
+      - custom
+
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
 volumes:
   postgres-data:
+
+networks:
+  custom:
+    name: ngrok
+    external: true
