@@ -29,8 +29,6 @@ async def to_main_page(message: types.Message, **kwargs):
                          reply_markup=admin_kb.as_markup(resize_keyboard=True))
 
 
-
-
 @admin_router.message(F.text == 'Получить отчет по определённому сотруднику')
 @admin_only
 async def get_report_for_current_employee(message: types.Message, **kwargs):

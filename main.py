@@ -2,13 +2,12 @@ import asyncio
 
 from uvicorn import Config, Server
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.fsm.storage.memory import MemoryStorage
-
 
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -27,12 +26,11 @@ from utils.scheduler import quiz_scheduler
 WEBHOOK_PATH = f'/{TOKEN}'
 BASE_WEBHOOK_URL = 'https://lenient-hippo-conversely.ngrok-free.app'
 
-
 #Database connection
 engine = create_async_engine(db_url, echo=True)
 async_session = async_sessionmaker(engine, expire_on_commit=False)
 
-#Create database with start webserver
+#Create database
 async def start_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -61,32 +59,29 @@ config = Config(app=app,
                 port=8000)
 server = Server(config)
 
-#Set webhook on start
+#Set webhook and create database on start
 @app.on_event('startup')
 async def on_startup():
     await bot.set_webhook(f"{BASE_WEBHOOK_URL}{WEBHOOK_PATH}",
                           drop_pending_updates=True)
     await start_db()
 
-
+#Endpoint for checking
 @app.get(WEBHOOK_PATH)
 async def any():
     return {'status': 'ok'}
 
+#Endpoint for incoming updates
 @app.post(WEBHOOK_PATH)
 async def bot_webhook(update: dict):
     tg_update = types.Update(**update)
     await dp.feed_update(bot=bot, update=tg_update)
 
 
-
-
 #Initialize AsyncScheduler
 scheduler = AsyncIOScheduler()
 scheduler.add_job(quiz_scheduler, 'cron', second=30, args=(bot, dp.storage, async_session))
 scheduler.start()
-
-
 
 
 if __name__ == '__main__':
