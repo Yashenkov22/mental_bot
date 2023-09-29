@@ -12,3 +12,16 @@ class CurrentEmpoyee(StatesGroup):
 
 class RegisterUser(StatesGroup):
     fullname: str = State()
+
+
+class LoadPicture(StatesGroup):
+    user_id = State()
+    pic_id = State()
+
+
+class ValidateUser(StatesGroup):
+    secret_word = State()
+
+
+class ChangeName(StatesGroup):
+    fullname = State()

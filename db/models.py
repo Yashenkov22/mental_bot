@@ -11,7 +11,7 @@ class User(Base):
 
     user_id: Mapped[int] = mapped_column(primary_key=True)
     fullname: Mapped[str] = mapped_column(String(100))
-
+    subscription: Mapped[bool] = mapped_column(default=True)
 
 
 class MentalState(Base):
@@ -21,3 +21,11 @@ class MentalState(Base):
     user_id = mapped_column(ForeignKey('users.user_id'))
     date: Mapped[date] = mapped_column(DATE, default=date.today())
     state: Mapped[int] = mapped_column(INTEGER)
+
+
+class Picture(Base):
+    __tablename__ = 'pictures'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    pic_id: Mapped[str]
+    user_id = mapped_column(ForeignKey('users.user_id'))

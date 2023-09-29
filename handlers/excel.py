@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import date
 from typing import Union
 
 import pandas as pd
@@ -9,7 +9,7 @@ from aiogram.types import FSInputFile
 
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from utils.admin_decorator import admin_only
+from utils.permission_decorators import admin_only
 from db.queries import all_result_query
 
 
@@ -25,6 +25,7 @@ def read_sql_query(con, stmt):
 async def get_excel(message: Union[types.Message, types.CallbackQuery],
                     engine: AsyncEngine,
                     stmt=all_result_query,
+                    employee_name=None,
                     **kwargs):
     
     async with engine.begin() as conn:
@@ -38,17 +39,23 @@ async def get_excel(message: Union[types.Message, types.CallbackQuery],
             await message.answer('В базе пока нет данных о состоянии выбранного сотрудника')
     
     else:
-        filename = str(datetime.now()) + '.xlsx'
+        subname_file: str
+        if isinstance(message, types.Message):
+            subname_file = 'Отчет по всем сотрудникам'
+        else:
+            subname_file = f'Отчет по сотруднику {employee_name}'
+        filename = subname_file + ' ' + str(date.today()) + '.xlsx'
         df_sql.to_excel(filename)
         
         if isinstance(message, types.CallbackQuery):
             message = message.message
  
         await message.answer_document(FSInputFile(filename))
-        await message.delete()
 
         if os.path.isfile(filename):
             os.remove(filename)
+    
+    await message.delete()
 
 
 @excel_router.message()
