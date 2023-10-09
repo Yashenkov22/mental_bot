@@ -9,6 +9,7 @@ from utils.keyboards import quiz_kb, create_main_kb
 from utils.states import Quiz
 from utils.name_states import response_for_state
 from utils.cat_api import get_cat
+from utils.delete_message import try_delete_prev_message, add_message_for_delete
 
 
 quiz_router = Router()
@@ -25,6 +26,8 @@ pattern = '''
 
 
 async def start_quiz(bot: Bot, user_id: int, state: FSMContext):
+    await try_delete_prev_message(bot, state)
+
     await state.set_state(Quiz.answer)
     await bot.send_message(user_id,
                            pattern,
@@ -34,8 +37,13 @@ async def start_quiz(bot: Bot, user_id: int, state: FSMContext):
 @quiz_router.callback_query(Quiz.answer)
 async def end_quiz(callback: types.CallbackQuery,
                    state: FSMContext,
-                   session: AsyncSession):
-    
+                   session: AsyncSession,
+                   bot: Bot):
+    d = await state.get_data()
+    msg = d.get('first_quiz')
+    if msg:
+        await bot.delete_message(msg.chat.id, msg.message_id)
+
     answer = callback.data.split('_')[-1]
     await state.update_data(answer=int(answer))
     data = await state.get_data()
@@ -55,7 +63,8 @@ async def end_quiz(callback: types.CallbackQuery,
         main_kb = create_main_kb(callback.from_user.id)
         await callback.message.answer_photo(BufferedInputFile(cat_photo, 'cat.jpeg'),
                                             caption='Лови котика, надеюсь он описывает тебя сейчас😄\nЕсли нет, не принимай близко к сердцу, я всего лишь бот, но я стараюсь',
-                                            reply_markup=main_kb.as_markup(resize_keyboard=True))
+                                            reply_markup=main_kb.as_markup(resize_keyboard=True),
+                                            disable_notification=True)
         
     await callback.answer()
     await callback.message.delete()

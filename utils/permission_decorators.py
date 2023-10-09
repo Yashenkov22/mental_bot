@@ -4,6 +4,7 @@ from config import ADMIN_IDS
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.queries import check_user
+from .delete_message import add_message_for_delete
 
 
 def admin_only(func):
@@ -16,7 +17,13 @@ def admin_only(func):
         if message.from_user.id in ADMIN_IDS:
             return await func(*args, **kwargs)
         else:
-            return await message.answer('Доступ запрещен!')
+            state = kwargs['state']
+            msg = await message.answer('Доступ запрещен!')
+            data = await state.get_data()
+            add_message_for_delete(data, msg)
+
+            await message.delete()
+            return msg
     return wrapped
 
 
@@ -27,13 +34,21 @@ def user_only(func):
 
         for arg in args:
             if isinstance(arg, types.Message):
-                message = arg 
+                message = arg
+                break
+        
+        session = kwargs['session']
 
-        session = kwargs['session'] 
         user = await check_user(session, message.from_user.id)
 
         if user:
             return await func(*args, **kwargs)
         else:
-            return await message.answer('Доступ запрещен!')
+            state = kwargs['state']
+            msg = await message.answer('Доступ запрещен!')
+            data = await state.get_data()
+            add_message_for_delete(data, msg)
+
+            await message.delete()
+            return msg
     return wrapped

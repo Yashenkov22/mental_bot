@@ -37,8 +37,8 @@ async def check_user(session: AsyncSession, user_id: int):
         return user
 
 
-async def register_user(session: AsyncSession, data: dict[str,str], message: types.Message):
-    fullname = ' '.join(reversed(data['fullname'].split()))
+async def register_user(session: AsyncSession, fullname: str, message: types.Message):
+    fullname = ' '.join(reversed(fullname.split()))
     async with session.begin():
         session: AsyncSession
         session.add(User(user_id=message.from_user.id,

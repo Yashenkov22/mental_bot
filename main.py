@@ -21,6 +21,7 @@ from handlers.manage_subscribe import subscribe_router
 from handlers.user import user_router
 from handlers.pictures import pictures_router
 from handlers.excel import excel_router
+from handlers.main import main_router
 from utils.scheduler import quiz_scheduler
 
 
@@ -49,6 +50,7 @@ dp.include_router(subscribe_router)
 dp.include_router(user_router)
 dp.include_router(pictures_router)
 dp.include_router(excel_router)
+dp.include_router(main_router)
 
 #Add session and database connection in handlers 
 dp.update.middleware(DbSessionMiddleware(session_pool=async_session,

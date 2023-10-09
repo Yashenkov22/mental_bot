@@ -24,7 +24,6 @@ def create_main_kb(user_id):
         btn_name = 'Профиль'
 
     main_kb.row(types.KeyboardButton(text=btn_name))
-    main_kb.row(types.KeyboardButton(text='Добавить картинку для коллег'))
 
     return main_kb
 

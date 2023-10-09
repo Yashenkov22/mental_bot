@@ -21,4 +21,5 @@ async def try_delete_prev_message(bot: Bot,
 
 def add_message_for_delete(data: dict[str, Any],
                            msg: types.Message):
-    data['prev_msg'].append((msg.chat.id, msg.message_id))
+    if msg:
+        data['prev_msg'].append((msg.chat.id, msg.message_id))
